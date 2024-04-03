@@ -2,9 +2,11 @@ package main
 
 import (
 	"bytes"
-	"io"
+	"html/template"
 	"net/http"
+	"strings"
 
+	"github.com/adrg/frontmatter"
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting"
 )
@@ -19,6 +21,19 @@ func main() {
 		panic(err)
 	}
 
+}
+
+type PostData struct {
+	Metadata Metadata
+	Content  template.HTML
+}
+
+type Metadata struct {
+	Title       string   `yaml:"title"`
+	Author      string   `yaml:"author"`
+	Description string   `yaml:"description"`
+	Date        string   `yaml:"date"`
+	Tags        []string `yaml:"tags"`
 }
 
 func PostHandler(sl SlugReader) http.HandlerFunc {
@@ -36,17 +51,28 @@ func PostHandler(sl SlugReader) http.HandlerFunc {
 			http.Error(w, "Error creating markdown renderer", http.StatusInternalServerError)
 			return
 		}
+		var metadata Metadata
+
+		rest, err := frontmatter.Parse(strings.NewReader(postMarkdown), &metadata)
+		if err != nil {
+			http.Error(w, "Error parsing frontmatter", http.StatusInternalServerError)
+			return
+		}
+
 		var buf bytes.Buffer
-		err = mdRenderer.Convert([]byte(postMarkdown), &buf)
+		err = mdRenderer.Convert([]byte(rest), &buf)
 		if err != nil {
 			http.Error(w, "Error converting markdown", http.StatusInternalServerError)
 			return
 		}
+		tpl, err := template.ParseFiles("templates/post.go.tmpl")
 		if err != nil {
-			// TODO: Handle different errors in the future
-			http.Error(w, "Post not found", http.StatusNotFound)
+			http.Error(w, "Error parsing template", http.StatusInternalServerError)
 			return
 		}
-		io.Copy(w, &buf)
+		err = tpl.Execute(w, PostData{
+			Metadata: metadata,
+			Content:  template.HTML(buf.String()),
+		})
 	}
 }
