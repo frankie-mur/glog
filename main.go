@@ -2,8 +2,11 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
+	"io"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/adrg/frontmatter"
@@ -14,6 +17,7 @@ import (
 func main() {
 	//render markdown to the screen
 	mux := http.NewServeMux()
+	mux.HandleFunc("GET /", homeHandler)
 	mux.HandleFunc("GET /post/{slug}", PostHandler(FileReader{}))
 
 	err := http.ListenAndServe(":8080", mux)
@@ -21,6 +25,15 @@ func main() {
 		panic(err)
 	}
 
+}
+
+type HomePageData struct {
+	Posts []PostTitle
+}
+
+type PostTitle struct {
+	Title string
+	Slug  string
 }
 
 type PostData struct {
@@ -34,6 +47,17 @@ type Metadata struct {
 	Description string   `yaml:"description"`
 	Date        string   `yaml:"date"`
 	Tags        []string `yaml:"tags"`
+}
+
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+	tpl, err := template.ParseFiles("templates/home.go.tmpl")
+	if err != nil {
+		http.Error(w, "Error parsing template", http.StatusInternalServerError)
+		return
+	}
+	tpl.Execute(w, HomePageData{
+		Posts: getPostTitles(),
+	})
 }
 
 func PostHandler(sl SlugReader) http.HandlerFunc {
@@ -75,4 +99,37 @@ func PostHandler(sl SlugReader) http.HandlerFunc {
 			Content:  template.HTML(buf.String()),
 		})
 	}
+}
+
+func getPostTitles() []PostTitle {
+	files, err := os.ReadDir("posts")
+	if err != nil {
+		panic(err)
+	}
+	var titles []PostTitle
+	for _, file := range files {
+		//open file
+		f, err := os.Open(fmt.Sprintf("posts/%s", file.Name()))
+		if err != nil {
+			panic(err)
+		}
+		defer f.Close()
+		//read file
+		b, err := io.ReadAll(f)
+		if err != nil {
+			panic(err)
+		}
+		//parse frontmatter
+		var metadata Metadata
+		_, err = frontmatter.Parse(strings.NewReader(string(b)), &metadata)
+		if err != nil {
+			panic(err)
+		}
+		var postTile = PostTitle{
+			Title: metadata.Title,
+			Slug:  fmt.Sprintf("/post/%s", strings.Split(file.Name(), ".")[0]),
+		}
+		titles = append(titles, postTile)
+	}
+	return titles
 }
