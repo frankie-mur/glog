@@ -60,5 +60,9 @@ func PostHandler(sl SlugReader) http.HandlerFunc {
 			Metadata: metadata,
 			Content:  template.HTML(buf.String()),
 		})
+		if err != nil {
+			http.Error(w, "Error executing template", http.StatusInternalServerError)
+			return
+		}
 	}
 }

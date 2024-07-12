@@ -62,5 +62,6 @@ func getPostTitles() []PostTitle {
 		}
 		titles = append(titles, postTile)
 	}
+	fmt.Printf("titles: %+v\n", titles)
 	return titles
 }
