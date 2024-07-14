@@ -22,6 +22,15 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func aboutHandler(w http.ResponseWriter, r *http.Request) {
+	tpl, err := template.ParseFiles("templates/about.go.tmpl")
+	if err != nil {
+		http.Error(w, "Error parsing template", http.StatusInternalServerError)
+		return
+	}
+	tpl.Execute(w, nil)
+}
+
 func PostHandler(sl SlugReader) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		slug := r.PathValue("slug")

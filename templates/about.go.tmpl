@@ -4,46 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-  <title>{{.Metadata.Title}} | FF</title>
+  <title>Frankies Fix</title>
   <style>
     body {
       display: flex;
       flex-direction: column;
       min-height: 100vh;
       background-color: #1e1e1e; /* Dark background */
-      color: #e0e0e0 !important; /* Lighter text color */
+      color: #c5c8c6; /* Light text color */
       font-family: 'Courier New', Courier, monospace; /* Terminal-like font */
     }
     main {
       flex: 1;
-      color: #e0e0e0 !important; /* Lighter text color */
     }
     a {
       color: #81a2be; /* Light blue links */
     }
     a:hover {
       color: #8abeb7; /* Lighter blue on hover */
-    }
-    .prose {
-      color: #e0e0e0 !important; /* Lighter text color */
-    }
-    .post-meta {
-      font-size: 0.875rem; /* Smaller font size for meta information */
-      color: #718096; /* Grayish color for meta information */
-      margin-bottom: 1rem; /* Spacing below meta information */
-    }
-    .tag {
-      display: inline-block;
-      background-color: #4a5568; /* Grayish blue background for tags */
-      color: #e0e0e0; /* Light text color for tags */
-      font-size: 0.75rem; /* Smaller font size for tags */
-      padding: 0.25rem 0.5rem; /* Padding around tags */
-      margin-right: 0.5rem; /* Spacing between tags */
-      margin-bottom: 0.5rem; /* Spacing below tags */
-      border-radius: 0.25rem; /* Rounded corners for tags */
-    }
-    h1, h2, h3, h4, h5, h6 {
-      color: #e0e0e0 !important; /* Lighter text color for headers */
     }
   </style>
 </head>
@@ -59,18 +37,8 @@
       </ul>
     </div>
   </nav>
-  <main class="container mx-auto">
-    <h1 class="text-4xl font-bold text-center mb-4">{{.Metadata.Title}}</h1>
-    <div class="post-meta text-center mb-6">
-      <p class="text-gray-500">Published on {{.Metadata.Date}} • Tags:</p>
-      {{range .Metadata.Tags}}
-      <span class="tag">{{.}}</span>
-      {{end}}
-    </div>
-    <div class="prose max-w-full mx-auto bg-gray-800 p-6 rounded-lg shadow-lg">
-      {{.Content}}
-    </div>
-  </main>
+    <h1> This page is a work in progess...</h1>
+  <!-- Footer -->
   <footer class="bg-gray-900 text-white p-6 mt-auto">
     <div class="container mx-auto text-center">
       <p>&copy; 2024 Frankie's Blog. All rights reserved.</p>
